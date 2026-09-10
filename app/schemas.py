@@ -1,0 +1,26 @@
+from pydantic import BaseModel, Field
+class RepoScanRequest(BaseModel):
+    owner: str=Field(pattern=r"^[A-Za-z0-9_.-]+$")
+    repo: str=Field(pattern=r"^[A-Za-z0-9_.-]+$")
+    ref: str="HEAD"
+class CodeScanRequest(BaseModel):
+    filename: str="app.py"
+    code: str=Field(min_length=1,max_length=500_000)
+class PRSummaryRequest(BaseModel):
+    owner: str
+    repo: str
+    pull_number: int=Field(gt=0)
+class Finding(BaseModel):
+    tool: str
+    rule_id: str
+    severity: str
+    confidence: str|None=None
+    filename: str
+    line: int
+    message: str
+class ScanResponse(BaseModel):
+    scan_id: int
+    repo: str
+    findings: list[Finding]
+    counts: dict[str,int]
+    ai_triage: str|None=None
